@@ -97,7 +97,6 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
 </head>
 <body>
 <video id="bg" src="imagenes/fondo.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
-
 <header>
   <div class="av"><span>J</span><img src="imagenes/jarvis.png" alt="" onerror="this.remove()"></div>
   <div><h1>Jarvis</h1><div id="hi"></div></div>
@@ -112,7 +111,6 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
     <button id="mode">🌓 Modo: automático</button>
   </div>
 </header>
-
 <main id="main">
   <section id="tools">
     <h2>¿Qué hacemos hoy?</h2>
@@ -121,7 +119,6 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
   </section>
   <div id="chat"></div>
 </main>
-
 <div class="dock">
   <div id="files" hidden></div>
   <div class="wrap">
@@ -140,7 +137,6 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
     </div>
   </div>
 </div>
-
 <dialog id="th">
   <h2>Tema del chat</h2>
   <label>Fondo del chat<input type="color" data-v="--bg"></label>
@@ -150,7 +146,6 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
   <label>Botón enviar<input type="color" data-v="--send"></label>
   <div class="row"><button id="rst">Restablecer</button><button id="ok">Listo</button></div>
 </dialog>
-
 <div id="login" hidden>
   <form id="lc" autocomplete="off">
     <div class="av"><span>J</span></div>
@@ -165,11 +160,9 @@ dialog input{width:48px;height:32px;border:0;background:none;padding:0}
     <p class="gn">Como invitado, tu chat no se guarda.</p>
   </form>
 </div>
-
 <script>
 // ===== CONFIGURA AQUÍ la dirección de tu Worker de Cloudflare =====
-const WORKER_URL = 'https://TU-WORKER.TU-USUARIO.workers.dev';
-
+const WORKER_URL = 'https://jarvis.joeljhonpierosatornicio.workers.dev';
 const TOOLS = [
   {id:'chat', n:'Chat', i:'💬', d:'Conversación general'},
   {id:'imagen', n:'Imagen', i:'🎨', d:'Crear imágenes'},
@@ -194,8 +187,6 @@ const ls = {
 let user = ls.g('j_user', null) || gs(), msgs = (user && user.guest) ? [] : ls.g('j_msgs', []), tool = 'chat', depth = 'equilibrada', files = [];
 let pref = ls.g('j_pref', {mode:'auto', c:{}, keep:false});
 const api = (p, m, b)=>fetch(WORKER_URL + p, {method:m||'GET', headers:{'Content-Type':'application/json', Authorization:'Bearer ' + (user ? user.token : '')}, body: b ? JSON.stringify(b) : undefined});
-
-/* ---------- Tema ---------- */
 const mq = matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){
   const r = document.documentElement;
@@ -216,8 +207,6 @@ $('#thm').onclick = ()=>{closeMenu(); syncTh(); $('#th').showModal();};
 $('#rst').onclick = ()=>{pref.c={}; savePref(); applyTheme(); syncTh();};
 $('#ok').onclick = ()=>$('#th').close();
 $('#mode').onclick = ()=>{pref.mode = {auto:'light', light:'dark', dark:'auto'}[pref.mode]; savePref(); applyTheme();};
-
-/* ---------- Menú y desplegables ---------- */
 const closeMenu = ()=>$('#menu').hidden = true;
 $('#dots').onclick = ()=>$('#menu').hidden = !$('#menu').hidden;
 document.addEventListener('click', e=>{
@@ -243,8 +232,6 @@ function updBar(){
 }
 $('#bt').onclick = ()=>pop($('#bt'), TOOLS, tool, id=>{tool = id; drawTools(); updBar();});
 $('#bd').onclick = ()=>pop($('#bd'), DEPTHS, depth, id=>{depth = id; updBar();});
-
-/* ---------- Tarjetas ---------- */
 function drawTools(){
   const g = $('#grid'); g.innerHTML = '';
   TOOLS.forEach(x=>{
@@ -255,8 +242,6 @@ function drawTools(){
     g.append(c);
   });
 }
-
-/* ---------- Mensajes ---------- */
 function add(role, text, imgs){
   const d = document.createElement('div'); d.className = 'm ' + role;
   const t = document.createElement('div'); t.className = 't'; t.textContent = text; d.append(t);
@@ -264,8 +249,6 @@ function add(role, text, imgs){
   $('#chat').append(d); $('#main').scrollTop = 1e9; return d;
 }
 const save = ()=>{ if(!(user && user.guest)) ls.s('j_msgs', msgs.slice(-60)); };
-
-/* ---------- Adjuntos (+) ---------- */
 $('#att').onclick = ()=>$('#file').click();
 $('#file').onchange = async e=>{
   for(const f of e.target.files){
@@ -284,8 +267,6 @@ function drawFiles(){
     s.append(x); b.append(s);
   });
 }
-
-/* ---------- Voz: dictado + animación según el volumen ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec, listening = false, ac, an, st, raf;
 async function wave(on){
@@ -332,8 +313,6 @@ $('#vz').onclick = ()=>{
   rec.onerror = ()=>rec.stop();
   rec.start();
 };
-
-/* ---------- Enviar al Worker ---------- */
 function grow(){ const q = $('#q'); q.style.height = 'auto'; q.style.height = Math.min(q.scrollHeight, 140) + 'px'; }
 $('#q').oninput = grow;
 $('#q').onkeydown = e=>{ if(e.key==='Enter' && !e.shiftKey && matchMedia('(pointer:fine)').matches){ e.preventDefault(); send(); } };
@@ -362,8 +341,6 @@ async function send(){
   }
   save();
 }
-
-/* ---------- Datos: borrar chat, guardar, eliminar ---------- */
 function resetChat(){ msgs = []; save(); $('#chat').innerHTML = ''; tool = 'chat'; drawTools(); updBar(); $('#tools').hidden = false; }
 $('#clr').onclick = async ()=>{
   closeMenu();
@@ -382,8 +359,6 @@ $('#wipe').onclick = async ()=>{
   catch{ alert('No pude eliminar tus datos del servidor. Intenta de nuevo con internet.'); return; }
   ['j_user','j_msgs'].forEach(ls.r); user = null; resetChat(); showLogin();
 };
-
-/* ---------- Registro con nombre de usuario ---------- */
 function showLogin(){ $('#login').hidden = false; $('#un').focus(); }
 function gs(){ try{ return JSON.parse(sessionStorage.getItem('j_guest')); }catch{ return null; } }
 $('#reg').onclick = ()=>{ closeMenu(); showLogin(); };
@@ -417,8 +392,6 @@ $('#lc').onsubmit = async e=>{
     $('#le').textContent = x.message==='taken' ? 'Ese nombre ya está en uso. Prueba con otro.' : 'No pude conectar con el servidor. Revisa tu internet.';
   }
 };
-
-/* ---------- Inicio ---------- */
 applyTheme(); drawTools(); updBar();
 msgs.forEach(m=>add(m.r, m.t));
 $('#tools').hidden = msgs.length > 0;
